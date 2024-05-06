@@ -52,7 +52,7 @@ impl<T: Debug + Clone> Tree<T> {
         // hello/+
         let mut tmp_node_vector: Vec<Rc<Node<T>>> = vec![Rc::clone(node)];
         let mut new_tmp_node_vector: Vec<Rc<Node<T>>> = vec![];
-        let mut iter = topic.split('/');
+        let mut iter = topic.split('/').peekable();
         while let Some(e) = iter.next() {
             println!("topic element: {:?}", e);
             // hello
@@ -71,6 +71,7 @@ impl<T: Debug + Clone> Tree<T> {
                     for n in node_vector {
                         result.push(n.value.clone());
                     }
+                    return result;
                 }
 
                 if let Some(node_vector) = node.children.borrow().get(&'+'.to_string()) {
@@ -80,8 +81,8 @@ impl<T: Debug + Clone> Tree<T> {
                 }
             }
             // /a/b/cのcまで到達したら結果を格納する
-            if iter.next().is_none() {
-                for node in &tmp_node_vector {
+            if iter.peek().is_none() {
+                for node in &new_tmp_node_vector {
                     result.push(node.value.clone());
                 }
             }
@@ -117,24 +118,39 @@ mod tests {
     }
 
     #[test]
-    fn search_tree() {
+    fn search_tree_single() {
         let root: Node<i32> = Node::new_node(None);
         let rc_root: Rc<Node<i32>> = Rc::new(root);
         Tree::add_subscriber(&rc_root, "hoge/piyo/fuga".to_string(), Some(10));
-        //let leaf = Node::new_node(Some(1));
-        //let rc_leaf = Rc::new(leaf);
-        //Tree::add_child_node(&rc_root, rc_leaf, "hoge/fuga/piyo".to_string());
-
-        //let leaf2 = Node::new_node(Some(2));
-        //let rc_leaf2 = Rc::new(leaf2);
-        //Tree::add_child_node(&rc_root, rc_leaf2, "hoge/piyo/fuga".to_string());
-
-        println!("{:?}", rc_root);
-
-        let result = Tree::search_topic(&rc_root, "hoge/fuga/piyo".to_string());
+        Tree::add_subscriber(&rc_root, "hoge/not/fuga".to_string(), Some(9));
+        Tree::add_subscriber(&rc_root, "hoge/piyo/not".to_string(), Some(8));
+        let result = Tree::search_topic(&rc_root, "hoge/piyo/fuga".to_string());
+        assert_eq!(result, vec![Some(10)]);
         println!("result = {:?}", result);
     }
+
+    #[test]
+    fn search_tree_wild_plus() {
+        let root: Node<i32> = Node::new_node(None);
+        let rc_root: Rc<Node<i32>> = Rc::new(root);
+        Tree::add_subscriber(&rc_root, "hoge/+/fuga".to_string(), Some(10));
+        Tree::add_subscriber(&rc_root, "hoge/+/piyo".to_string(), Some(10));
+        let result = Tree::search_topic(&rc_root, "hoge/piyo/fuga".to_string());
+        println!("result = {:?}", result);
+        assert_eq!(result, vec![Some(10)]);
+    }
+    #[test]
+    fn search_tree_wild_sharp() {
+        let root: Node<i32> = Node::new_node(None);
+        let rc_root: Rc<Node<i32>> = Rc::new(root);
+        Tree::add_subscriber(&rc_root, "hoge/#".to_string(), Some(10));
+        Tree::add_subscriber(&rc_root, "hoge/piyo/#".to_string(), Some(10));
+        let result = Tree::search_topic(&rc_root, "hoge/fuga/piyo".to_string());
+        println!("result = {:?}", result);
+        assert_eq!(result, vec![Some(10)]);
+    }
 }
+
 /*
 Node { value: None,
     children: RefCell
