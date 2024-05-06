@@ -1,0 +1,20 @@
+{
+  "binaries": [
+    {
+      "name": "miqo-topic",
+      "src_path": "/Users/syureneko/miqo-topic/src/main.rs",
+      "required_features": []
+    }
+  ],
+  "examples": [],
+  "integration_tests": [],
+  "unit_tests": [
+    {
+      "package_name": "miqo-topic",
+      "test_cases": [
+        "tests::search_tree",
+        "tests::small_tree"
+      ]
+    }
+  ]
+}
