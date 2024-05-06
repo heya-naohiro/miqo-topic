@@ -130,7 +130,7 @@ mod tests {
         let root: Node<i32> = Node::new_node(None);
         let rc_root: Rc<Node<i32>> = Rc::new(root);
         Tree::add_subscriber(&rc_root, "hoge/+/fuga".to_string(), Some(10));
-        Tree::add_subscriber(&rc_root, "hoge/+/piyo".to_string(), Some(10));
+        Tree::add_subscriber(&rc_root, "hoge/+/piyo".to_string(), Some(9));
         let result = Tree::search_topic(&rc_root, "hoge/piyo/fuga".to_string());
         println!("result = {:?}", result);
         assert_eq!(result, vec![Some(10)]);
@@ -140,7 +140,7 @@ mod tests {
         let root: Node<i32> = Node::new_node(None);
         let rc_root: Rc<Node<i32>> = Rc::new(root);
         Tree::add_subscriber(&rc_root, "hoge/#".to_string(), Some(10));
-        Tree::add_subscriber(&rc_root, "hoge/piyo/#".to_string(), Some(10));
+        Tree::add_subscriber(&rc_root, "hoge/piyo/#".to_string(), Some(9));
         let result = Tree::search_topic(&rc_root, "hoge/fuga/piyo".to_string());
         println!("result = {:?}", result);
         assert_eq!(result, vec![Some(10)]);
