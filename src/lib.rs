@@ -51,23 +51,19 @@ impl<T: Debug + Clone> Tree<T> {
         // hello/world
         // hello/+
         let mut tmp_node_vector: Vec<Rc<Node<T>>> = vec![Rc::clone(node)];
-        let mut new_tmp_node_vector: Vec<Rc<Node<T>>> = vec![];
+
         let mut iter = topic.split('/').peekable();
         while let Some(e) = iter.next() {
-            println!("topic element: {:?}", e);
-            // hello
-            new_tmp_node_vector = vec![];
+            let mut new_tmp_node_vector: Vec<Rc<Node<T>>> = vec![];
 
             for node in &tmp_node_vector {
                 //let node_ref = Rc::clone(node);
-                println!("Hello!!!! {:?}", e);
                 if let Some(node_vector) = node.children.borrow().get(&e.to_string()) {
                     for n in node_vector {
                         new_tmp_node_vector.push(Rc::clone(n));
                     }
                 }
                 if let Some(node_vector) = node.children.borrow().get(&'#'.to_string()) {
-                    //new_tmp_node_vector.extend(*node_vector);
                     for n in node_vector {
                         result.push(n.value.clone());
                     }
