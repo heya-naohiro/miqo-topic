@@ -67,7 +67,6 @@ impl<T: Debug + Clone> Tree<T> {
                     for n in node_vector {
                         result.push(n.value.clone());
                     }
-                    return result;
                 }
 
                 if let Some(node_vector) = node.children.borrow().get(&'+'.to_string()) {
