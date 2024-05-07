@@ -7,6 +7,7 @@ use std::rc::{Rc, Weak};
 #[derive(Debug)]
 struct Node<T: Debug + Clone> {
     value: Option<T>,
+    id: Option<String>,
     children: RefCell<HashMap<String, Vec<Rc<Node<T>>>>>,
     parent: RefCell<Weak<Node<T>>>,
 }
@@ -15,6 +16,7 @@ impl<T: Debug + Clone> Node<T> {
     pub fn new_node(value: Option<T>) -> Node<T> {
         return Node {
             value,
+            id: None,
             children: RefCell::new(HashMap::new()),
             parent: RefCell::new(Weak::new()),
         };
@@ -35,7 +37,7 @@ impl<T: Debug + Clone> Tree<T> {
         v.push(child)
     }
 
-    fn add_subscriber(root: &Rc<Node<T>>, topic_filter: String, value: Option<T>) {
+    pub fn add_subscriber(root: &Rc<Node<T>>, topic_filter: String, value: Option<T>) {
         let mut tmp_node = Rc::clone(&root);
         for tfe in topic_filter.split('/') {
             let child = Rc::new(Node::new_node(value.clone()));
@@ -44,8 +46,10 @@ impl<T: Debug + Clone> Tree<T> {
             tmp_node = Rc::clone(&child)
         }
     }
-
-    fn search_topic(node: &Rc<Node<T>>, topic: String) -> Vec<Option<T>> {
+    fn delete_subscriber(node: &Rc<Node<T>>, id: String, topic_filter: String) {
+        /* todo */
+    }
+    pub fn search_topic(node: &Rc<Node<T>>, topic: String) -> Vec<Option<T>> {
         println!("search : {:?}", node);
         let mut result: Vec<Option<T>> = vec![];
         // hello/world
@@ -57,7 +61,6 @@ impl<T: Debug + Clone> Tree<T> {
             let mut new_tmp_node_vector: Vec<Rc<Node<T>>> = vec![];
 
             for node in &tmp_node_vector {
-                //let node_ref = Rc::clone(node);
                 if let Some(node_vector) = node.children.borrow().get(&e.to_string()) {
                     for n in node_vector {
                         new_tmp_node_vector.push(Rc::clone(n));
@@ -67,7 +70,6 @@ impl<T: Debug + Clone> Tree<T> {
                     for n in node_vector {
                         result.push(n.value.clone());
                     }
-                    return result;
                 }
 
                 if let Some(node_vector) = node.children.borrow().get(&'+'.to_string()) {
@@ -146,22 +148,3 @@ mod tests {
         assert_eq!(result, vec![Some(10)]);
     }
 }
-
-/*
-Node { value: None,
-    children: RefCell
-        { value:
-            {"hogehoge2": Node
-                { value: Some(2),
-                    children: RefCell { value: {} },
-                    parent: RefCell { value: (Weak) }
-                },
-            "hogehoge": Node
-                { value: Some(1), children: RefCell { value: {} }, parent: RefCell { value: (Weak) }
-                }
-            }
-        }, parent: RefCell
-        { value: (Weak) }
-    }
-
-*/
